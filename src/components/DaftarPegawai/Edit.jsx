@@ -1,5 +1,5 @@
 // Import useState dan useEffect untuk mengelola state dan side effects
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 // Import axios untuk melakukan HTTP request
 import axios from "axios";
 // Import useNavigate untuk navigasi dan useParams untuk mengambil parameter URL
@@ -39,13 +39,9 @@ export default function EditDaftarPegawai() {
       try {
         setIsLoadingData(true);
 
-        const pegawaiRes = await axios.get(
-          `http://localhost:3000/api/daftarPegawai/${id}`
-        );
+        const pegawaiRes = await axios.get(`/api/daftarPegawai/${id}`);
 
-        const ruanganRes = await axios.get(
-          "http://localhost:3000/api/ruangan"
-        );
+        const ruanganRes = await axios.get("/api/ruangan");
 
         setFormData({
           id_pegawai: pegawaiRes.data.id_pegawai,
@@ -103,10 +99,7 @@ export default function EditDaftarPegawai() {
     setError(null);
 
     try {
-      const response = await axios.put(
-        `http://localhost:3000/api/daftarPegawai/${id}`,
-        formData
-      );
+      const response = await axios.put(`/api/daftarPegawai/${id}`, formData);
 
       console.log("Pegawai updated:", response.data);
 
@@ -142,12 +135,6 @@ export default function EditDaftarPegawai() {
           {error}
         </div>
       )}
-
-      {/* Debug */}
-      <div className="alert alert-info">
-        <strong>State saat ini:</strong>
-        <pre>{JSON.stringify(formData, null, 2)}</pre>
-      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">

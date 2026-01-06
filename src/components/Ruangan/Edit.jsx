@@ -1,5 +1,5 @@
 // Import useState dan useEffect untuk mengelola state dan side effects
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 // Import axios untuk melakukan HTTP request
 import axios from "axios";
 // Import useNavigate untuk navigasi dan useParams untuk mengambil parameter URL
@@ -33,9 +33,7 @@ export default function EditRuangan() {
       try {
         setIsLoadingData(true);
 
-        const response = await axios.get(
-          `http://localhost:3000/api/ruangan/${id}`
-        );
+        const response = await axios.get(`/api/ruangan/${id}`);
 
         // Set data ke form
         setFormData({
@@ -69,49 +67,45 @@ export default function EditRuangan() {
     });
   };
 
- // Handle submit form
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  // Handle submit form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Validasi input
-  if (!formData.nama_ruangan || !formData.lantai || !formData.keterangan) {
-    setError("Semua field harus diisi!");
-    return;
-  }
+    // Validasi input
+    if (!formData.nama_ruangan || !formData.lantai || !formData.keterangan) {
+      setError("Semua field harus diisi!");
+      return;
+    }
 
-  setLoading(true);
-  setError(null);
+    setLoading(true);
+    setError(null);
 
-  try {
-    // PATCH / PUT request untuk update ruangan
-    const response = await axios.put(
-      `http://localhost:3000/api/ruangan/${id}`,
-      {
+    try {
+      // PATCH / PUT request untuk update ruangan
+      const response = await axios.put(`/api/ruangan/${id}`, {
         nama_ruangan: formData.nama_ruangan,
         lantai: formData.lantai,
         keterangan: formData.keterangan,
-      }
-    );
+      });
 
-    console.log("Ruangan updated:", response.data);
+      console.log("Ruangan updated:", response.data);
 
-    // ✅ NOTIFIKASI BERHASIL (seperti di Create)
-    alert("Data ruangan berhasil diupdate!");
+      // ✅ NOTIFIKASI BERHASIL (seperti di Create)
+      alert("Data ruangan berhasil diupdate!");
 
-    // Redirect ke halaman list ruangan
-    navigate("/ruangan");
-  } catch (err) {
-    console.error("Error updating ruangan:", err);
-    setError(
-      err.response?.data?.message ||
-        err.message ||
-        "Terjadi kesalahan saat mengupdate data"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
-
+      // Redirect ke halaman list ruangan
+      navigate("/ruangan");
+    } catch (err) {
+      console.error("Error updating ruangan:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Terjadi kesalahan saat mengupdate data"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Tampilkan loading saat data sedang diambil
   if (isLoadingData) {
@@ -129,12 +123,6 @@ const handleSubmit = async (e) => {
           {error}
         </div>
       )}
-
-      {/* Debug info */}
-      <div className="alert alert-info">
-        <strong>State saat ini:</strong>
-        <pre>{JSON.stringify(formData, null, 2)}</pre>
-      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">

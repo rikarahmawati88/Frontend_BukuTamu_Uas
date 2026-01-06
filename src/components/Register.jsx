@@ -3,37 +3,33 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-export default function Login({ setToken }) {
+export default function Register() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("pegawai"); // Default role
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/auth/login", {
+      await axios.post("/api/auth/register", {
         name,
         password,
+        role,
       });
 
-      const token = response.data.token;
-      localStorage.setItem("authToken", token);
-      setToken(token);
-      
       Swal.fire({
         icon: "success",
-        title: "Login Berhasil",
-        timer: 1500,
-        showConfirmButton: false
+        title: "Berhasil Register",
+        text: "Silahkan login",
       });
-      
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Login Gagal",
-        text: error.response?.data?.message || "Username atau password salah",
+        title: "Gagal Register",
+        text: error.response?.data?.message || "Terjadi kesalahan",
       });
     }
   };
@@ -43,8 +39,8 @@ export default function Login({ setToken }) {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card shadow-sm">
-            <div className="card-header bg-success text-white">
-              <h3 className="mb-0">Login</h3>
+            <div className="card-header bg-primary text-white">
+              <h3 className="mb-0">Register</h3>
             </div>
             <div className="card-body">
               <form onSubmit={handleSubmit}>
@@ -70,11 +66,22 @@ export default function Login({ setToken }) {
                     required
                   />
                 </div>
-                <button type="submit" className="btn btn-success w-100 mb-3">
-                  Login
+                <div className="mb-3">
+                  <label className="form-label">Role</label>
+                  <select
+                    className="form-select"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                  >
+                    <option value="pegawai">Pegawai</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary w-100 mb-3">
+                  Register
                 </button>
                 <div className="text-center">
-                  Belum punya akun? <a href="/register" onClick={(e) => { e.preventDefault(); navigate("/register"); }}>Daftar di sini</a>
+                  Sudah punya akun? <a href="/login" onClick={(e) => { e.preventDefault(); navigate("/login"); }}>Login di sini</a>
                 </div>
               </form>
             </div>

@@ -1,5 +1,5 @@
 // Import useState dan useEffect
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 // Import axios
 import axios from "axios";
 // Import react-router
@@ -33,14 +33,10 @@ export default function EditDaftarTamu() {
         setIsLoadingData(true);
 
         // Ambil data tamu
-        const tamuRes = await axios.get(
-          `http://localhost:3000/api/daftarTamu/${id}`
-        );
+        const tamuRes = await axios.get(`/api/daftarTamu/${id}`);
 
         // Ambil data pegawai
-        const pegawaiRes = await axios.get(
-          "http://localhost:3000/api/daftarPegawai"
-        );
+        const pegawaiRes = await axios.get("/api/daftarPegawai");
 
         setFormData({
           nama_tamu: tamuRes.data.nama_tamu,
@@ -55,9 +51,7 @@ export default function EditDaftarTamu() {
       } catch (err) {
         console.error("Error fetching daftar tamu:", err);
         setError(
-          err.response?.data?.message ||
-            err.message ||
-            "Gagal mengambil data"
+          err.response?.data?.message || err.message || "Gagal mengambil data"
         );
       } finally {
         setIsLoadingData(false);
@@ -95,10 +89,7 @@ export default function EditDaftarTamu() {
     setError(null);
 
     try {
-      const response = await axios.put(
-        `http://localhost:3000/api/daftarTamu/${id}`,
-        formData
-      );
+      const response = await axios.put(`/api/daftarTamu/${id}`, formData);
 
       console.log("Daftar tamu updated:", response.data);
 
@@ -109,9 +100,7 @@ export default function EditDaftarTamu() {
     } catch (err) {
       console.error("Error updating daftar tamu:", err);
       setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Gagal mengupdate data"
+        err.response?.data?.message || err.message || "Gagal mengupdate data"
       );
     } finally {
       setLoading(false);
@@ -127,15 +116,7 @@ export default function EditDaftarTamu() {
     <div className="container mt-5">
       <h2 className="mb-4">Edit Daftar Tamu</h2>
 
-      {error && (
-        <div className="alert alert-danger">{error}</div>
-      )}
-
-      {/* Debug */}
-      <div className="alert alert-info">
-        <strong>State saat ini:</strong>
-        <pre>{JSON.stringify(formData, null, 2)}</pre>
-      </div>
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -205,11 +186,7 @@ export default function EditDaftarTamu() {
         </div>
 
         <div className="d-flex gap-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={loading}
-          >
+          <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Mengupdate..." : "Update"}
           </button>
 

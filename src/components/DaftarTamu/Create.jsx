@@ -1,5 +1,5 @@
 // Import useState untuk mengelola state
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 // Import axios untuk melakukan HTTP request ke API
 import axios from "axios";
 
@@ -28,7 +28,7 @@ export default function CreateDaftarTamu() {
   // Ambil data pegawai (sudah populate ruangan)
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/daftarPegawai")
+      .get("/api/daftarPegawai")
       .then((res) => setPegawai(res.data))
       .catch((err) => console.error("Error fetching pegawai:", err));
   }, []);
@@ -70,10 +70,7 @@ export default function CreateDaftarTamu() {
 
     try {
       // Kirim POST request
-      const response = await axios.post(
-        "http://localhost:3000/api/daftarTamu",
-        formData
-      );
+      const response = await axios.post("/api/daftarTamu", formData);
 
       console.log("Tamu created:", response.data);
       alert("Data tamu berhasil disimpan!");
@@ -122,12 +119,6 @@ export default function CreateDaftarTamu() {
           {error}
         </div>
       )}
-
-      {/* Debug info */}
-      <div className="alert alert-info">
-        <strong>State saat ini:</strong>
-        <pre>{JSON.stringify({ ...formData, ruanganPegawai }, null, 2)}</pre>
-      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -205,11 +196,7 @@ export default function CreateDaftarTamu() {
         )}
 
         <div className="d-flex gap-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={loading}
-          >
+          <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Menyimpan..." : "Simpan"}
           </button>
 

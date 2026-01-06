@@ -31,7 +31,7 @@ export default function RuanganList() {
         setLoading(true);
 
         const response = await axios.get(
-          "http://localhost:3000/api/ruangan",
+          "/api/ruangan",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ export default function RuanganList() {
   // Tampilkan pesan error jika ada kesalahan
   if (error) return <div>Error: {error}</div>;
 
-  // 🔍 FILTER DATA RUANGAN (AMAN)
+  // FILTER DATA RUANGAN (AMAN)
   const filteredRuangan = ruangan.filter((r) => {
     const keyword = search.toLowerCase();
 
@@ -68,7 +68,7 @@ export default function RuanganList() {
     );
   });
 
-  // 🗑️ Fungsi hapus data ruangan
+  // Fungsi hapus data ruangan
   const handleDelete = (id, nama_ruangan) => {
     Swal.fire({
       title: `Yakin mau hapus ${nama_ruangan} ?`,
@@ -81,7 +81,7 @@ export default function RuanganList() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:3000/api/ruangan/${id}`, {
+          .delete(`/api/ruangan/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

@@ -14,6 +14,8 @@ export default function DaftarTamuList() {
   const [loading, setLoading] = useState(true);
   // State untuk menyimpan pesan error jika terjadi kesalahan
   const [error, setError] = useState(null);
+  // State untuk keyword pencarian
+  const [search, setSearch] = useState("");
 
   // useEffect akan dijalankan sekali saat komponen pertama kali di-render
   useEffect(() => {
@@ -23,9 +25,7 @@ export default function DaftarTamuList() {
         setLoading(true);
 
         // GET daftar tamu + populate pegawai & ruangan
-        const response = await axios.get(
-          "http://localhost:3000/api/daftarTamu"
-        );
+        const response = await axios.get("/api/daftarTamu");
 
         setTamu(response.data);
         setError(null);
@@ -44,6 +44,19 @@ export default function DaftarTamuList() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  // FILTER DATA TAMU (AMAN)
+  const filteredTamu = tamu.filter((t) => {
+    const keyword = search.toLowerCase();
+
+    return (
+      (t.nama_tamu?.toLowerCase() || "").includes(keyword) ||
+      (t.no_telepon || "").includes(search) ||
+      (t.keperluan?.toLowerCase() || "").includes(keyword) ||
+      (t.id_pegawai?.nama?.toLowerCase() || "").includes(keyword) ||
+      (t.id_pegawai?.id_ruangan?.nama_ruangan?.toLowerCase() || "").includes(keyword)
+    );
+  });
+
   // Fungsi hapus data tamu
   const handleDelete = (id, nama) => {
     Swal.fire({
@@ -57,7 +70,7 @@ export default function DaftarTamuList() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:3000/api/daftarTamu/${id}`)
+          .delete(`/api/daftarTamu/${id}`)
           .then((response) => {
             // Update state setelah hapus
             setTamu(tamu.filter((t) => t._id !== id));
@@ -81,6 +94,15 @@ export default function DaftarTamuList() {
     <div>
       <h1>Daftar Tamu</h1>
 
+      {/* SEARCH BAR */}
+      <input
+        type="text"
+        className="form-control mb-3"
+        placeholder="Cari tamu..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <NavLink to="/daftar-tamu/create" className="btn btn-primary mb-3">
         Tambah Tamu
       </NavLink>
@@ -98,35 +120,44 @@ export default function DaftarTamuList() {
           </tr>
         </thead>
         <tbody>
-          {tamu.map((t) => (
-            <tr key={t._id}>
-              <td>{t.nama_tamu}</td>
-              <td>{t.no_telepon}</td>
-              <td>{t.keperluan}</td>
-              <td>
-                {new Date(t.waktu_kunjungan).toLocaleString("id-ID")}
-              </td>
-              <td>{t.id_pegawai?.nama}</td>
-              <td>{t.id_pegawai?.id_ruangan?.nama_ruangan}</td>
-              <td>
-                <button
-                  className="btn btn-danger me-2"
-                  onClick={() => handleDelete(t._id, t.nama_tamu)}
-                >
-                  Hapus
-                </button>
-
-                <NavLink
-                  to={`/daftar-tamu/edit/${t._id}`}
-                  className="btn btn-warning"
-                >
-                  Ubah
-                </NavLink>
+          {filteredTamu.length === 0 ? (
+            <tr>
+              <td colSpan="7" className="text-center">
+                Data tamu tidak ditemukan
               </td>
             </tr>
-          ))}
+          ) : (
+            filteredTamu.map((t) => (
+              <tr key={t._id}>
+                <td>{t.nama_tamu}</td>
+                <td>{t.no_telepon}</td>
+                <td>{t.keperluan}</td>
+                <td>
+                  {new Date(t.waktu_kunjungan).toLocaleString("id-ID")}
+                </td>
+                <td>{t.id_pegawai?.nama || "-"}</td>
+                <td>{t.id_pegawai?.id_ruangan?.nama_ruangan || "-"}</td>
+                <td>
+                  <button
+                    className="btn btn-danger me-2"
+                    onClick={() => handleDelete(t._id, t.nama_tamu)}
+                  >
+                    Hapus
+                  </button>
+
+                  <NavLink
+                    to={`/daftar-tamu/edit/${t._id}`}
+                    className="btn btn-warning"
+                  >
+                    Ubah
+                  </NavLink>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
   );
 }
+

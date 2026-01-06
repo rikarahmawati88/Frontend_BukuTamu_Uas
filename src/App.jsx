@@ -1,17 +1,19 @@
 import React, { Suspense, useState } from "react";
 import {
+  NavLink,
+  Route,
   BrowserRouter as Router,
   Routes,
-  Route,
-  NavLink,
+  Navigate,
 } from "react-router-dom";
 
+import Logout from "./components/Logout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Logout from "./components/LogOut";
 
 // Lazy loading pages
 const Home = React.lazy(() => import("./components/Home"));
-const Login = React.lazy(() => import("./components/login"));
+const Login = React.lazy(() => import("./components/Login"));
+const Register = React.lazy(() => import("./components/Register"));
 
 const RuanganList = React.lazy(() => import("./components/Ruangan/List"));
 const RuanganCreate = React.lazy(() => import("./components/Ruangan/Create"));
@@ -27,72 +29,72 @@ const DaftarPegawaiEdit = React.lazy(() =>
   import("./components/DaftarPegawai/Edit")
 );
 
-const DaftarTamuList = React.lazy(() =>
-  import("./components/DaftarTamu/List")
-);
+const DaftarTamuList = React.lazy(() => import("./components/DaftarTamu/List"));
 const DaftarTamuCreate = React.lazy(() =>
   import("./components/DaftarTamu/Create")
 );
-const DaftarTamuEdit = React.lazy(() =>
-  import("./components/DaftarTamu/Edit")
-);
+const DaftarTamuEdit = React.lazy(() => import("./components/DaftarTamu/Edit"));
+
+import axios from "axios";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("authToken"));
 
+  if (token) {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete axios.defaults.headers.common["Authorization"];
+  }
+
   return (
     <Router>
       {/* NAVBAR */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <div className="container">
-          <NavLink className="navbar-brand" to="/">
-            Buku Tamu
-          </NavLink>
+      {token && (
+        <nav className="navbar navbar-expand-lg navbar-light bg-light mb-4">
+          <div className="container">
+            <NavLink className="navbar-brand" to="/">
+              Buku Tamu
+            </NavLink>
 
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
+            <button
+              className="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+            >
+              <span className="navbar-toggler-icon"></span>
+            </button>
 
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav me-auto">
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/ruangan">
-                  Ruangan
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/daftar-pegawai">
-                  Daftar Pegawai
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/daftar-tamu">
-                  Daftar Tamu
-                </NavLink>
-              </li>
-            </ul>
+            <div className="collapse navbar-collapse" id="navbarNav">
+              <ul className="navbar-nav me-auto">
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/ruangan">
+                    Ruangan
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/daftar-pegawai">
+                    Daftar Pegawai
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/daftar-tamu">
+                    Daftar Tamu
+                  </NavLink>
+                </li>
+              </ul>
 
-            <ul className="navbar-nav">
-              <li className="nav-item">
-                {token ? (
+              <ul className="navbar-nav">
+                <li className="nav-item">
                   <NavLink className="nav-link" to="/logout">
                     Logout
                   </NavLink>
-                ) : (
-                  <NavLink className="nav-link" to="/login">
-                    Login
-                  </NavLink>
-                )}
-              </li>
-            </ul>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       {/* CONTENT */}
       <div className="container">
@@ -109,15 +111,20 @@ function App() {
             <Route
               path="/"
               element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
+                token ? (
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                ) : (
+                  <Navigate to="/login" replace />
+                )
               }
             />
 
             {/* PUBLIC */}
             <Route path="/login" element={<Login setToken={setToken} />} />
-            <Route path="/logout" element={<Logout />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/logout" element={<Logout setToken={setToken} />} />
 
             {/* PROTECTED ROUTES */}
             <Route

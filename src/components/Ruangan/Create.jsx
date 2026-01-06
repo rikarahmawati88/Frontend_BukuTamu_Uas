@@ -41,10 +41,7 @@ export default function CreateRuangan() {
 
     try {
       // Kirim POST request
-      const response = await axios.post(
-        "http://localhost:3000/api/ruangan",
-        formData
-      );
+      const response = await axios.post("/api/ruangan", formData);
 
       console.log("Ruangan created:", response.data);
       alert("Data ruangan berhasil disimpan!");
@@ -87,12 +84,6 @@ export default function CreateRuangan() {
           {error}
         </div>
       )}
-
-      {/* Debug info */}
-      <div className="alert alert-info">
-        <strong>State saat ini:</strong>
-        <pre>{JSON.stringify(formData, null, 2)}</pre>
-      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -140,11 +131,7 @@ export default function CreateRuangan() {
         </div>
 
         <div className="d-flex gap-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={loading}
-          >
+          <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Menyimpan..." : "Simpan"}
           </button>
 

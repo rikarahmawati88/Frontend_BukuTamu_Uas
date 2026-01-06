@@ -14,6 +14,8 @@ export default function DaftarPegawaiList() {
   const [loading, setLoading] = useState(true);
   // State untuk menyimpan pesan error jika terjadi kesalahan
   const [error, setError] = useState(null);
+  // State untuk keyword pencarian
+  const [search, setSearch] = useState("");
 
   // useEffect akan dijalankan sekali saat komponen pertama kali di-render
   useEffect(() => {
@@ -24,9 +26,7 @@ export default function DaftarPegawaiList() {
         setLoading(true);
 
         // Mengambil data dari API menggunakan axios
-        const response = await axios.get(
-          "http://localhost:3000/api/daftarPegawai"
-        );
+        const response = await axios.get("/api/daftarPegawai");
 
         // Simpan data yang diterima ke state pegawai
         setPegawai(response.data);
@@ -52,6 +52,19 @@ export default function DaftarPegawaiList() {
   // Tampilkan pesan error jika ada kesalahan
   if (error) return <div>Error: {error}</div>;
 
+  // FILTER DATA PEGAWAI (AMAN)
+  const filteredPegawai = pegawai.filter((p) => {
+    const keyword = search.toLowerCase();
+
+    return (
+      (p.id_pegawai?.toLowerCase() || "").includes(keyword) ||
+      (p.nama?.toLowerCase() || "").includes(keyword) ||
+      (p.no_telpon || "").includes(search) ||
+      (p.jabatan?.toLowerCase() || "").includes(keyword) ||
+      (p.id_ruangan?.nama_ruangan?.toLowerCase() || "").includes(keyword)
+    );
+  });
+
   // Fungsi hapus data pegawai
   const handleDelete = (id, nama) => {
     Swal.fire({
@@ -65,7 +78,7 @@ export default function DaftarPegawaiList() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:3000/api/daftarPegawai/${id}`)
+          .delete(`/api/daftarPegawai/${id}`)
           .then((response) => {
             // Update state setelah hapus
             setPegawai(pegawai.filter((p) => p._id !== id));
@@ -89,6 +102,15 @@ export default function DaftarPegawaiList() {
     <div>
       <h1>Daftar Pegawai</h1>
 
+      {/* SEARCH BAR */}
+      <input
+        type="text"
+        className="form-control mb-3"
+        placeholder="Cari pegawai..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <NavLink to="/daftar-pegawai/create" className="btn btn-primary mb-3">
         Tambah Pegawai
       </NavLink>
@@ -105,31 +127,38 @@ export default function DaftarPegawaiList() {
           </tr>
         </thead>
         <tbody>
-          {/* Loop data pegawai dan tampilkan dalam baris tabel */}
-          {pegawai.map((p) => (
-            <tr key={p._id}>
-              <td>{p.id_pegawai}</td>
-              <td>{p.nama}</td>
-              <td>{p.no_telpon}</td>
-              <td>{p.jabatan}</td>
-              <td>{p.id_ruangan?.nama_ruangan}</td>
-              <td>
-                <button
-                  className="btn btn-danger me-2"
-                  onClick={() => handleDelete(p._id, p.nama)}
-                >
-                  Hapus
-                </button>
-
-                <NavLink
-                  to={`/daftar-pegawai/edit/${p._id}`}
-                  className="btn btn-warning"
-                >
-                  Ubah
-                </NavLink>
+          {filteredPegawai.length === 0 ? (
+            <tr>
+              <td colSpan="6" className="text-center">
+                Data pegawai tidak ditemukan
               </td>
             </tr>
-          ))}
+          ) : (
+            filteredPegawai.map((p) => (
+              <tr key={p._id}>
+                <td>{p.id_pegawai}</td>
+                <td>{p.nama}</td>
+                <td>{p.no_telpon}</td>
+                <td>{p.jabatan}</td>
+                <td>{p.id_ruangan?.nama_ruangan || "-"}</td>
+                <td>
+                  <button
+                    className="btn btn-danger me-2"
+                    onClick={() => handleDelete(p._id, p.nama)}
+                  >
+                    Hapus
+                  </button>
+
+                  <NavLink
+                    to={`/daftar-pegawai/edit/${p._id}`}
+                    className="btn btn-warning"
+                  >
+                    Ubah
+                  </NavLink>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
